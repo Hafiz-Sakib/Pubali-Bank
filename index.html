@@ -1,0 +1,82 @@
+i<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>login page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@500&family=Poppins:wght@400;500&display=swap");
+      #bankname {
+        font-family: "Hind Siliguri", sans-serif;
+      }
+
+      /* font-family: 'Hind Siliguri', sans-serif;  */
+      /* font-family: 'Poppins', sans-serif;  */
+    </style>
+  </head>
+  <body class="bg-green-300">
+    <header>
+      <h1
+        class="text-5xl text-center mt-16 mb-6 font-bold text-green-900"
+        id="bankname"
+      >
+        পূবালী ব্যাংক লিমিটেড
+        <br />
+        PUBALI BANK LIMITED
+        <br />
+        <span class="text-2xl">ঐতিহ্যের পথ বেয়ে অর্থনৈতিক অগ্রগতি</span>
+      </h1>
+    </header>
+    <main>
+      <section class="bg-purple-100 w-3/4 mx-auto p-8 rounded-lg">
+        <!-- login -->
+
+        <h3 class="text-2xl px-24 my-6 text-red-500">
+          Please Login to your account
+        </h3>
+
+        <!-- Input Text  -->
+        <div>
+          <label
+            class="block text-grey-darker text-sm font-bold mb-2"
+            for="E-mail"
+            >E-mail
+          </label>
+
+          <input
+            type="text"
+            name=""
+            class="border-4 block border-gray-400 rounded-md w-1/2 px-2 mb-2"
+            placeholder="Please type Your mail"
+            id="user-email"
+          />
+
+          <label
+            class="block text-grey-darker text-sm font-bold mb-2"
+            for="password"
+            >Password
+          </label>
+
+          <input
+            type="password"
+            name=""
+            class="mt-2 block border-4 border-gray-400 rounded-md w-1/2 px-2"
+            placeholder="Type Password"
+            id="user-pass"
+          />
+
+          <!-- sign Up Button -->
+          <button
+            class="border-2 mt-4 border-gray-400 bg-green-500 hover:bg-cyan-600 rounded-md p-1"
+            id="login-submit"
+          >
+            Sign Up
+          </button>
+        </div>
+      </section>
+    </main>
+    <script src="js/login.js"></script>
+  </body>
+</html>
