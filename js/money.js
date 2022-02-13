@@ -53,4 +53,7 @@ document
       updateTotalField("withdraw-total", withdrawAmount);
       updateMainBalance(withdrawAmount, false);
     }
+    if (withdrawAmount > currentTotalBalance) {
+      document.body.style.backgroundColor = "red";
+    }
   });
