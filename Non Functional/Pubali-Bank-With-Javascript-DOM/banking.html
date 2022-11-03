@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Banking Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@500&family=Poppins:wght@400;500&display=swap");
+      #banglafont {
+        font-family: "Hind Siliguri", sans-serif;
+      }
+
+      /* font-family: 'Hind Siliguri', sans-serif;  */
+      /* font-family: 'Poppins', sans-serif;  */
+    </style>
+  </head>
+  <body class="bg-green-300">
+    <header>
+      <h1
+        class="text-5xl text-center mt-16 mb-3 font-bold text-green-900 pb-10"
+        id="banglafont"
+      >
+        পূবালী ব্যাংক লিমিটেড
+      </h1>
+      
+      <h2 id="banglafont" class="text-red-600 ml-44 text-2xl">আজকের হিসাব দেখুনঃ</h2>
+    </header>
+    <main class="w-3/4 mx-auto">
+      <!-- Balance and Transaction -->
+
+      <section class="mt-10">
+        <div class="grid grid-cols-3 gap-4 text-white">
+          <div class="bg-purple-300 p-8 rounded-lg">
+            <h3 class="text-2xl">Deposit</h3>
+            <h4 class="text-4xl">$<span id="deposit-total">00</span></h4>
+          </div>
+          <div class="bg-blue-300 p-8 rounded-lg">
+            <h3 class="text-2xl">WithDraw</h3>
+            <h4 class="text-4xl">$<span id="total-withdraw">00</span></h4>
+          </div>
+          <div class="bg-red-300 p-8 rounded-lg">
+            <h3 class="text-2xl">Balance</h3>
+            <h4 class="text-4xl">$<span id="total-balance">1200</span></h4>
+          </div>
+        </div>
+      </section>
+      <!-- Deposit And WithDraw -->
+      <div class="grid grid-cols-2 gap-6">
+          <!-- 1 Deposit Money!-->
+
+<div class="bg-red-100 p-8 rounded-lg mt-10">
+    <h2 class="text-2xl pb-4">Deposit Money</h2>
+    
+    <input
+      type="text"
+      name=""
+      class="border-4 block border-gray-400 rounded-md w-1/2 px-2 mb-2"
+      placeholder="Type Deposit Amount"
+      id="deposit-input"
+    />
+    <button
+      class="border-2 mt-4 border-gray-400 bg-purple-300 rounded-md p-1"
+      id="deposit-button"
+    >
+      confirm
+    </button>
+  </div>
+  
+  <!-- 2 Withdraw  Money!-->
+  
+  <div class="bg-yellow-100 p-8 rounded-lg mt-10">
+    <h2 class="text-2xl pb-4">WithDraw Money</h2>
+    <input
+      type="text"
+      name=""
+      class="border-4 block border-gray-400 rounded-md w-1/2 px-2 mb-2"
+      placeholder="Type Withdraw Amount"
+      id="withdraw-input"
+    />
+    
+    <button
+      class="border-2 mt-4 border-gray-400 bg-blue-300 rounded-md p-1"
+      id="withdraw-button"
+    >
+      confirm
+    </button>
+  </div>
+  
+      </div>
+      </section>
+    </main>
+    <script src="js/money.js"></script>
+  </body>
+</html>
