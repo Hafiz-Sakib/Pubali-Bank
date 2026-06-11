@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export const Route = createFileRoute("/_authenticated/fx")({
   head: () => ({ meta: [{ title: "Exchange Rates — Pubali Bank" }] }),
+  ssr: false,
   component: FxPage,
 });
 

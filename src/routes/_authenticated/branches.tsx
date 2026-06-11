@@ -9,6 +9,7 @@ import { Search, MapPin, Phone, Clock, Banknote } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/branches")({
   head: () => ({ meta: [{ title: "Branch Locator — Pubali Bank" }] }),
+  ssr: false,
   component: BranchesPage,
 });
 

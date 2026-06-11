@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Pubali Bank" }] }),
+  ssr: false,
   component: DashboardPage,
 });
 

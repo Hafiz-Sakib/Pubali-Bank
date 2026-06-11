@@ -12,6 +12,7 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/transactions")({
   head: () => ({ meta: [{ title: "Transactions — Pubali Bank" }] }),
+  ssr: false,
   component: TransactionsPage,
 });
 

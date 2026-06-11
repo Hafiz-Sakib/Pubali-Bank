@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/accounts")({
   head: () => ({ meta: [{ title: "Accounts — Pubali Bank" }] }),
+  ssr: false,
   component: AccountsPage,
 });
 
