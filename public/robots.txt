@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /auth
+Disallow: /dashboard
+Disallow: /accounts
+Disallow: /transactions
+Disallow: /transfer
+Disallow: /cards
+Disallow: /loans
+Disallow: /support
