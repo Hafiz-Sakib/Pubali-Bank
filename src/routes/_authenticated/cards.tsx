@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CreditCard, Snowflake, Settings2, ShieldAlert, RefreshCw, Ban, Globe, Wifi } from "lucide-react";
-import { useBankingStore, getCardSettings, setCardSettings, log } from "@/lib/banking-store";
+import { useBankingStore, getCardSettings, setCardSettings, log, useHydrated } from "@/lib/banking-store";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/cards")({
@@ -31,11 +31,28 @@ export const Route = createFileRoute("/_authenticated/cards")({
 
 function CardsPage() {
   const [openCard, setOpenCard] = useState<string | null>(null);
-  // subscribe to store changes
-  useBankingStore((s) => s.cardSettings);
+  const hydrated = useHydrated();
+  const cardSettings = useBankingStore((s) => s.cardSettings);
 
-  const cardTx = transactions.filter((t) => t.category === "Shopping" || t.category === "Food" || t.category === "Travel" || t.category === "ATM").slice(0, 8);
+  const cardTx = transactions
+    .filter((t) => t.category === "Shopping" || t.category === "Food" || t.category === "Travel" || t.category === "ATM")
+    .slice(0, 8);
   const totalSpend = cardTx.reduce((a, b) => a + b.amount, 0);
+
+  if (!hydrated) {
+    return (
+      <>
+        <Topbar title="Cards" subtitle="Manage your cards — freeze, set limits, toggle channels and request replacements." />
+        <PageContainer>
+          <div className="grid gap-5 lg:grid-cols-2">
+            {[0, 1].map((i) => (
+              <div key={i} className="surface-card h-64 animate-pulse rounded-xl bg-muted" />
+            ))}
+          </div>
+        </PageContainer>
+      </>
+    );
+  }
 
   return (
     <>
@@ -43,11 +60,16 @@ function CardsPage() {
       <PageContainer>
         <section className="grid gap-5 lg:grid-cols-2">
           {creditCards.map((c, i) => {
-            const s = getCardSettings(c.id);
+            const s = cardSettings[c.id] ?? getCardSettings(c.id);
             const pct = (c.outstanding / c.limit) * 100;
             return (
               <div key={c.id} className="surface-card overflow-hidden p-0">
-                <div className={["relative p-6 text-primary-foreground", s.blocked ? "bg-destructive" : s.frozen ? "bg-slate-600" : i === 0 ? "gradient-brand" : "bg-foreground"].join(" ")}>
+                <div
+                  className={[
+                    "relative p-6 text-primary-foreground",
+                    s.blocked ? "bg-destructive" : s.frozen ? "bg-slate-600" : i === 0 ? "gradient-brand" : "bg-foreground",
+                  ].join(" ")}
+                >
                   <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gold/25 blur-2xl" />
                   <div className="relative flex items-start justify-between">
                     <div>
@@ -55,8 +77,16 @@ function CardsPage() {
                       <p className="mt-1 font-display text-base font-semibold">{c.name}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      {s.frozen ? <Badge className="bg-white/20 text-white"><Snowflake className="mr-1 h-3 w-3" />Frozen</Badge> : null}
-                      {s.blocked ? <Badge className="bg-white/20 text-white"><Ban className="mr-1 h-3 w-3" />Blocked</Badge> : null}
+                      {s.frozen ? (
+                        <Badge className="bg-white/20 text-white">
+                          <Snowflake className="mr-1 h-3 w-3" />Frozen
+                        </Badge>
+                      ) : null}
+                      {s.blocked ? (
+                        <Badge className="bg-white/20 text-white">
+                          <Ban className="mr-1 h-3 w-3" />Blocked
+                        </Badge>
+                      ) : null}
                       <CreditCard className="h-6 w-6 text-primary-foreground/80" />
                     </div>
                   </div>
@@ -75,24 +105,45 @@ function CardsPage() {
                 <div className="p-5">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Used {Math.round(pct)}%</span>
-                    <span className="font-medium text-foreground">{formatBDT(c.outstanding)} / {formatBDT(c.limit)}</span>
+                    <span className="font-medium text-foreground">
+                      {formatBDT(c.outstanding)} / {formatBDT(c.limit)}
+                    </span>
                   </div>
                   <Progress value={pct} className="mt-2" />
                   <div className="mt-4 grid grid-cols-3 gap-3 text-center text-xs">
-                    <div className="rounded-lg border border-border p-2"><p className="text-muted-foreground">Total due</p><p className="mt-1 font-semibold text-foreground">{formatBDT(c.dueAmount)}</p></div>
-                    <div className="rounded-lg border border-border p-2"><p className="text-muted-foreground">Minimum</p><p className="mt-1 font-semibold text-foreground">{formatBDT(c.minDue)}</p></div>
-                    <div className="rounded-lg border border-border p-2"><p className="text-muted-foreground">Due date</p><p className="mt-1 font-semibold text-foreground">{formatDate(c.dueDate)}</p></div>
+                    <div className="rounded-lg border border-border p-2">
+                      <p className="text-muted-foreground">Total due</p>
+                      <p className="mt-1 font-semibold text-foreground">{formatBDT(c.dueAmount)}</p>
+                    </div>
+                    <div className="rounded-lg border border-border p-2">
+                      <p className="text-muted-foreground">Minimum</p>
+                      <p className="mt-1 font-semibold text-foreground">{formatBDT(c.minDue)}</p>
+                    </div>
+                    <div className="rounded-lg border border-border p-2">
+                      <p className="text-muted-foreground">Due date</p>
+                      <p className="mt-1 font-semibold text-foreground">{formatDate(c.dueDate)}</p>
+                    </div>
                   </div>
                   <div className="mt-4 flex flex-wrap gap-2">
-                    <Button size="sm" className="gradient-brand text-primary-foreground" disabled={s.blocked}>Pay now</Button>
-                    <Button size="sm" variant="outline" disabled={s.blocked} onClick={() => {
-                      setCardSettings(c.id, { frozen: !s.frozen });
-                      log({ type: "card", message: `${s.frozen ? "Unfroze" : "Froze"} card ${c.name}` });
-                      toast.success(s.frozen ? "Card unfrozen" : "Card frozen");
-                    }}>
-                      <Snowflake className="mr-1 h-4 w-4" />{s.frozen ? "Unfreeze" : "Freeze"}
+                    <Button size="sm" className="gradient-brand text-primary-foreground" disabled={s.blocked}>
+                      Pay now
                     </Button>
-                    <Button size="sm" variant="ghost" onClick={() => setOpenCard(c.id)}><Settings2 className="mr-1 h-4 w-4" />Settings</Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={s.blocked}
+                      onClick={() => {
+                        setCardSettings(c.id, { frozen: !s.frozen });
+                        log({ type: "card", message: `${s.frozen ? "Unfroze" : "Froze"} card ${c.name}` });
+                        toast.success(s.frozen ? "Card unfrozen" : "Card frozen");
+                      }}
+                    >
+                      <Snowflake className="mr-1 h-4 w-4" />
+                      {s.frozen ? "Unfreeze" : "Freeze"}
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => setOpenCard(c.id)}>
+                      <Settings2 className="mr-1 h-4 w-4" />Settings
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -119,7 +170,9 @@ function CardsPage() {
                     <div key={t.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3">
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-foreground">{t.description}</p>
-                        <p className="truncate text-xs text-muted-foreground">{formatDate(t.date)} · {t.category}</p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {formatDate(t.date)} · {t.category}
+                        </p>
                       </div>
                       <p className="text-sm font-semibold text-foreground tabular-nums">− {formatBDT(t.amount)}</p>
                     </div>
@@ -132,11 +185,14 @@ function CardsPage() {
                 <div className="mt-4 space-y-2">
                   {["Shopping", "Food", "Travel", "ATM"].map((cat) => {
                     const sum = cardTx.filter((t) => t.category === cat).reduce((a, b) => a + b.amount, 0);
-                    const pct = totalSpend ? (sum / totalSpend) * 100 : 0;
+                    const catPct = totalSpend ? (sum / totalSpend) * 100 : 0;
                     return (
                       <div key={cat}>
-                        <div className="flex justify-between text-xs"><span>{cat}</span><span className="font-medium">{formatBDT(sum)}</span></div>
-                        <Progress value={pct} className="mt-1 h-1.5" />
+                        <div className="flex justify-between text-xs">
+                          <span>{cat}</span>
+                          <span className="font-medium">{formatBDT(sum)}</span>
+                        </div>
+                        <Progress value={catPct} className="mt-1 h-1.5" />
                       </div>
                     );
                   })}
@@ -145,12 +201,14 @@ function CardsPage() {
             </Tabs>
           </div>
           <div className="surface-card p-5">
-            <div className="flex items-center gap-2 text-sm font-semibold text-foreground"><ShieldAlert className="h-4 w-4 text-primary" />Security tips</div>
+            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <ShieldAlert className="h-4 w-4 text-primary" />Security tips
+            </div>
             <ul className="mt-3 list-disc space-y-1.5 pl-5 text-xs text-muted-foreground">
               <li>Freeze your card immediately if misplaced — no charges can be made.</li>
               <li>Disable international transactions until you travel.</li>
               <li>Set a low daily spend limit on cards used for online shopping.</li>
-              <li>Block & replace a card if you suspect it has been compromised.</li>
+              <li>Block &amp; replace a card if you suspect it has been compromised.</li>
             </ul>
           </div>
         </section>
@@ -163,9 +221,9 @@ function CardsPage() {
 
 function CardSettingsDialog({ cardId, onClose }: { cardId: string | null; onClose: () => void }) {
   const card = creditCards.find((c) => c.id === cardId);
-  useBankingStore((s) => s.cardSettings);
+  const cardSettings = useBankingStore((s) => s.cardSettings);
   if (!card) return null;
-  const s = getCardSettings(card.id);
+  const s = cardSettings[card.id] ?? getCardSettings(card.id);
   return (
     <Dialog open={!!cardId} onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
@@ -176,33 +234,80 @@ function CardSettingsDialog({ cardId, onClose }: { cardId: string | null; onClos
 
         <div className="space-y-5 py-2">
           <Row label="Freeze card" hint="Temporarily block all transactions" icon={<Snowflake className="h-4 w-4" />}>
-            <Switch checked={s.frozen} onCheckedChange={(v) => { setCardSettings(card.id, { frozen: v }); toast.success(v ? "Card frozen" : "Card unfrozen"); }} disabled={s.blocked} />
+            <Switch
+              checked={s.frozen}
+              onCheckedChange={(v) => {
+                setCardSettings(card.id, { frozen: v });
+                toast.success(v ? "Card frozen" : "Card unfrozen");
+              }}
+              disabled={s.blocked}
+            />
           </Row>
           <Row label="Online transactions" hint="E-commerce and in-app payments" icon={<Wifi className="h-4 w-4" />}>
-            <Switch checked={s.onlineEnabled} onCheckedChange={(v) => setCardSettings(card.id, { onlineEnabled: v })} disabled={s.frozen || s.blocked} />
+            <Switch
+              checked={s.onlineEnabled}
+              onCheckedChange={(v) => setCardSettings(card.id, { onlineEnabled: v })}
+              disabled={s.frozen || s.blocked}
+            />
           </Row>
           <Row label="International transactions" hint="Allow charges from outside Bangladesh" icon={<Globe className="h-4 w-4" />}>
-            <Switch checked={s.internationalEnabled} onCheckedChange={(v) => setCardSettings(card.id, { internationalEnabled: v })} disabled={s.frozen || s.blocked} />
+            <Switch
+              checked={s.internationalEnabled}
+              onCheckedChange={(v) => setCardSettings(card.id, { internationalEnabled: v })}
+              disabled={s.frozen || s.blocked}
+            />
           </Row>
           <Row label="Contactless tap" hint="NFC payments at POS" icon={<Wifi className="h-4 w-4" />}>
-            <Switch checked={s.contactlessEnabled} onCheckedChange={(v) => setCardSettings(card.id, { contactlessEnabled: v })} disabled={s.frozen || s.blocked} />
+            <Switch
+              checked={s.contactlessEnabled}
+              onCheckedChange={(v) => setCardSettings(card.id, { contactlessEnabled: v })}
+              disabled={s.frozen || s.blocked}
+            />
           </Row>
           <div>
             <div className="flex items-baseline justify-between">
               <Label>Daily spend limit</Label>
               <span className="font-display text-sm font-bold">{formatBDT(s.dailySpendLimit)}</span>
             </div>
-            <Slider value={[s.dailySpendLimit]} min={10000} max={500000} step={5000} onValueChange={([v]) => setCardSettings(card.id, { dailySpendLimit: v })} className="mt-3" />
-            <div className="mt-1 flex justify-between text-xs text-muted-foreground"><span>৳10,000</span><span>৳5,00,000</span></div>
+            <Slider
+              value={[s.dailySpendLimit]}
+              min={10000}
+              max={500000}
+              step={5000}
+              onValueChange={([v]) => setCardSettings(card.id, { dailySpendLimit: v })}
+              className="mt-3"
+            />
+            <div className="mt-1 flex justify-between text-xs text-muted-foreground">
+              <span>৳10,000</span>
+              <span>৳5,00,000</span>
+            </div>
           </div>
         </div>
 
         <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-between">
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => { setCardSettings(card.id, { replacementRequested: true }); toast.success("Replacement card requested"); log({ type: "card", message: `Requested replacement for ${card.name}` }); }} disabled={s.replacementRequested}>
-              <RefreshCw className="mr-1 h-4 w-4" />{s.replacementRequested ? "Replacement requested" : "Replace card"}
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCardSettings(card.id, { replacementRequested: true });
+                toast.success("Replacement card requested");
+                log({ type: "card", message: `Requested replacement for ${card.name}` });
+              }}
+              disabled={s.replacementRequested}
+            >
+              <RefreshCw className="mr-1 h-4 w-4" />
+              {s.replacementRequested ? "Replacement requested" : "Replace card"}
             </Button>
-            <Button variant="destructive" onClick={() => { setCardSettings(card.id, { blocked: true, frozen: true }); toast.success("Card permanently blocked"); log({ type: "card", message: `Blocked card ${card.name}` }); onClose(); }} disabled={s.blocked}>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setCardSettings(card.id, { blocked: true, frozen: true });
+                toast.success("Card permanently blocked");
+                log({ type: "card", message: `Blocked card ${card.name}` });
+                onClose();
+              }}
+              disabled={s.blocked}
+            >
               <Ban className="mr-1 h-4 w-4" />Block permanently
             </Button>
           </div>
@@ -213,7 +318,17 @@ function CardSettingsDialog({ cardId, onClose }: { cardId: string | null; onClos
   );
 }
 
-function Row({ label, hint, icon, children }: { label: string; hint?: string; icon: React.ReactNode; children: React.ReactNode }) {
+function Row({
+  label,
+  hint,
+  icon,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex items-center justify-between gap-4 rounded-lg border border-border p-3">
       <div className="flex items-start gap-3">
