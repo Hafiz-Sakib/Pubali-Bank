@@ -28,6 +28,7 @@ import { formatDate } from "@/lib/banking-data";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/support")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Support — Pubali Bank" },

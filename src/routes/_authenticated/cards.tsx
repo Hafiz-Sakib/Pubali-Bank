@@ -16,6 +16,7 @@ import { useBankingStore, getCardSettings, setCardSettings, log, useHydrated } f
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/cards")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Cards — Pubali Bank" },

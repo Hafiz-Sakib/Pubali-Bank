@@ -19,6 +19,7 @@ import { submitLoanApplication, useBankingStore, type LoanStage } from "@/lib/ba
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/loans")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Loans — Pubali Bank" },

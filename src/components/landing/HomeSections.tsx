@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { HowItWorks, DigitalOffers, TrustBadges } from "./HomeSectionsMotion";
 import { Link } from "@tanstack/react-router";
 import {
   AreaChart, Area, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid,
@@ -513,13 +514,16 @@ export function HomeSections() {
     <>
       <MarketTicker />
       <StatsImpact />
+      <HowItWorks />
       <ProductExplorer />
       <SpendingInsights />
       <LoanCalculator />
       <SecurityPillars />
       <Testimonials />
+      <DigitalOffers />
       <AppPreview />
       <BranchNetwork />
+      <TrustBadges />
       <FAQ />
     </>
   );

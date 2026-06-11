@@ -29,6 +29,7 @@ import { ArrowRight, CheckCircle2, Loader2, ShieldCheck, Printer, Download, Hist
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/transfer")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Transfer — Pubali Bank" },
